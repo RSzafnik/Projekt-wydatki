@@ -1,0 +1,134 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
+.logo {
+  margin-bottom: none;
+}
+
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 85%;
+  margin: 20px auto;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url(/zdjęcia/money.jpeg);
+  background-size: fixed;
+  filter: blur(2px);
+  z-index: -1;
+}
+
+header {
+  text-align: center;
+}
+
+header img {
+  padding: 20px;
+  width: 75px;
+  height: 65px;
+}
+
+.info {
+  text-align: center;
+  color: rgb(248, 37, 37);
+  font-size: 24px;
+  font-weight: bold;
+  padding: 20px auto;
+  border-bottom: none;
+}
+
+.wrapper {
+  display: flex;
+}
+
+.section-income,
+.section-expense {
+  display: flex;
+  flex-direction: column;
+  margin-top: 30px;
+  padding: 30px;
+  border: 1px solid #ddd;
+  background-color: rgba(167, 149, 149, 0.82);
+}
+
+.section-income h3,
+.section-expense h3 {
+  font-size: 30px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-top: 20px;
+}
+
+.section-income label,
+.section-expense label {
+  display: block;
+  margin-top: 10px;
+}
+
+.section-income input[type="text"],
+.section-expense input[type="text"] {
+  width: 80%;
+  padding: 8px;
+  margin: 5px 0;
+  /* border: 1px solid #ddd; */
+}
+
+.section-income button,
+.section-expense button {
+  padding: 10px 15px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  margin: 10px 0;
+  border-radius: 25%;
+}
+
+.section-income button:hover,
+.section-expense button:hover {
+  background-color: #010101;
+}
+
+.section-income ol,
+.section-expense ol {
+  list-style-type: none;
+  padding: 0;
+}
+
+.section-income li,
+.section-expense li {
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+.section-expense {
+  margin-left: 20px;
+}
+
+.numbered-list {
+  counter-reset: item;
+  list-style-type: none;
+  padding: 0;
+}
+
+.numbered-list li::before {
+  content: counter(item) ".";
+  counter-increment: item;
+  margin-right: 8px;
+}
