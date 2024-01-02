@@ -1,11 +1,32 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const addButton = document.querySelector("#add-income");
-  const incomeList = document.querySelector("#income-list");
-  // kwota "available amount będzie się zmieniała - suma zysków i wydatków"
-  let availableAmount = document.querySelector("#available-amount");
-  let totalIncome = document.querySelector("#total-income");
+  const incomeForm = document.getElementById("income-form");
+  const expenseForm = document.getElementById("expense-form");
+  const incomeList = document.getElementById("income-list");
+  const expenseList = document.getElementById("expense-list");
+  const availableAmount = document.getElementById("available-amount");
+  const totalIncome = document.getElementById("total-income");
+  const totalExpense = document.getElementById("total-expense");
+  const messageContainer = document.getElementById("message-container");
+  let isEditing = false;
 
-  //   tutaj jest funkcja do aktualizacji kwoty przychodów  - łapiemy wszystkie elementy z tworzonej listy, aby widzieć sumę przychodów
+  function displayMessage(message, isError = false) {
+    messageContainer.innerText = message;
+    messageContainer.style.color = isError ? "red" : "green";
+  }
+
+  function validateInput(nameInput, valueInput) {
+    const name = nameInput.value.trim();
+    const value = parseFloat(valueInput.value.trim());
+    if (name === "" || /\d/.test(name)) {
+      displayMessage("Wprowadź poprawną nazwę!", true);
+      return false;
+    } else if (isNaN(value) || value < 0.01) {
+      displayMessage("Wprowadź poprawną kwotę!", true);
+      return false;
+    }
+    return true;
+  }
+
   function updateSummary() {
     let totalIncomeValue = 0;
     Array.from(incomeList.children).forEach((li) => {
@@ -23,130 +44,124 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-    totalIncome.innerText = totalIncomeValue;
-    totalExpense.innerText = totalExpenseValue;
-    availableAmount.innerText = totalIncomeValue - totalExpenseValue;
+    totalIncome.innerText = totalIncomeValue.toFixed(2);
+    totalExpense.innerText = totalExpenseValue.toFixed(2);
+    const calculatedAvailableAmount = totalIncomeValue - totalExpenseValue;
+    availableAmount.innerText = calculatedAvailableAmount.toFixed(2);
 
-    // tutaj sprawdzimy czy aktualny bilans jest ujemny
-
-    if (availableAmount.innerText == 0) {
-      alert("Bilans wynosi zero.");
-    }
-
-    // tutaj sprawdzimy, czy bilans jest mniejszy niż 0
-    if (availableAmount.innerText < 0) {
-      alert(
-        `Bilans jest ujemny. Jesteś na minusie ${Math.abs(
-          availableAmount.innerText
-        )} złotych. Znajdź dodatkowe przychody`
-      );
+    if (calculatedAvailableAmount < 0) {
+      displayMessage(`Jesteś na minusie!`, true);
+    } else if (calculatedAvailableAmount > 0) {
+      displayMessage(`Jesteś na plusie!`, false);
+    } else {
+      displayMessage("", false);
     }
   }
 
-  addButton.addEventListener("click", function () {
-    const incomeName = document.querySelector("#income-name").value;
-    const incomeValue = document.querySelector("#income-value").value;
-
-    if (!isNaN(incomeValue) && incomeValue >= 0) {
+  incomeForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    if (isEditing) {
+      displayMessage("Zakończ edycję przed dodaniem kolejnego elementu", true);
+      return;
+    }
+    const incomeNameInput = document.getElementById("income-name");
+    const incomeValueInput = document.getElementById("income-value");
+    if (!incomeNameInput.value.trim() || !incomeValueInput.value.trim()) {
+      displayMessage("Proszę wypełnić wszystkie pola!", true);
+    } else if (validateInput(incomeNameInput, incomeValueInput)) {
       const li = document.createElement("li");
-
-      li.innerHTML = `${incomeName}: <span class="income-value">${incomeValue}</span>                          
-                                      <button class="edit">Edytuj</button>
-                                      <button class="delete">Usuń</button>`;
+      li.innerHTML = `${
+        incomeNameInput.value
+      }: <span class="income-value">${parseFloat(
+        incomeValueInput.value
+      ).toFixed(2)}</span>
+                      <button class="edit">Edytuj</button>
+                      <button class="delete">Usuń</button>`;
       incomeList.appendChild(li);
-      document.querySelector("#income-name").value = "";
-      document.querySelector("#income-value").value = "";
+      incomeForm.reset();
       updateSummary();
-    } else {
-      alert("Wpisz inną kwotę!!!");
     }
   });
 
-  incomeList.addEventListener("click", function (event) {
-    if (event.target.classList.contains("delete")) {
-      event.target.parentElement.remove();
-      updateSummary();
-    } else if (event.target.classList.contains("edit")) {
-      const li = event.target.parentElement;
-      const incomeName = li.childNodes[0].nodeValue.trim().slice(0, -1);
-      const incomeValue = li.querySelector(".income-value").innerText;
-
-      li.innerHTML = `Nazwa: <input type="text" value="${incomeName}" class = "edit-name">
-                                      Kwota: <input type = "number" value="${incomeValue}" class ="edit-value">
-                                      <button class="save"> Zapisz</button>`;
-    } else if (event.target.classList.contains("save")) {
-      const li = event.target.parentElement;
-      const newName = li.querySelector(".edit-name").value;
-      const newValue = parseFloat(li.querySelector(".edit-value").value);
-
-      if (!isNaN(newValue) && newValue >= 0) {
-        li.innerHTML = `${newName}:     <span class="income-value">${newValue}</span> 
-                                        <button class="edit">Edytuj</button>
-                                        <button class="delete">Usuń</button>`;
-        updateSummary();
-      } else {
-        alert("Proszę wprowadzić prawidłową kwotę!");
-      }
+  expenseForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    if (isEditing) {
+      displayMessage("Zakończ edycję przed dodaniem kolejnego elementu", true);
+      return;
     }
-  });
-
-  // tutaj będą wydatki
-
-  const addButton2 = document.querySelector("#add-expense");
-  const expenseList = document.querySelector("#expense-list");
-  let totalExpense = document.querySelector("#total-expense");
-
-  //   tutaj wpisujemy co chcemy aby stało się po wciśnięciu przycisku "dodaj"
-  addButton2.addEventListener("click", function () {
-    // console.log("guzik kliknięty!");
-    const expenseName = document.querySelector("#expense-name").value;
-    const expenseValue = document.querySelector("#expense-value").value;
-    // console.log(expenseName, expenseValue);
-
-    // tutaj sprawdzamy co się stanie po wpisaniu danych "nazwy" i "kwoty"
-    if (!isNaN(expenseValue) && expenseValue >= 0) {
+    const expenseNameInput = document.getElementById("expense-name");
+    const expenseValueInput = document.getElementById("expense-value");
+    if (!expenseNameInput.value.trim() || !expenseValueInput.value.trim()) {
+      displayMessage("Proszę wypełnić wszystkie pola!", true);
+    } else if (validateInput(expenseNameInput, expenseValueInput)) {
       const li = document.createElement("li");
-      li.innerHTML = `${expenseName}: <span class="expense-value">${expenseValue}</span>
-                                          <button class ="edit">Edytuj</button>
-                                          <button class ="delete">Usuń</button>`;
-
+      li.innerHTML = `${
+        expenseNameInput.value
+      }: <span class="expense-value">${parseFloat(
+        expenseValueInput.value
+      ).toFixed(2)}</span>
+                      <button class="edit">Edytuj</button>
+                      <button class="delete">Usuń</button>`;
       expenseList.appendChild(li);
-      //   tutaj będą resetowały się dane w polac "nazwa wydatku" i "kwota" po wcisnięciu przycisku "dodaj"
-      document.querySelector("#expense-name").value = "";
-      document.querySelector("#expense-value").value = "";
+      expenseForm.reset();
       updateSummary();
-    } else {
-      alert("Wprowadź inną kwotę!");
     }
   });
 
-  expenseList.addEventListener("click", function (event) {
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest("ol")) return;
+    const isIncomeList = event.target.closest("ol").id === "income-list";
+    const isExpenseList = event.target.closest("ol").id === "expense-list";
+
     if (event.target.classList.contains("delete")) {
       event.target.parentElement.remove();
       updateSummary();
     } else if (event.target.classList.contains("edit")) {
+      isEditing = true;
       const li = event.target.parentElement;
-      // tutaj tworzymy kolejną tablicę
-      const expenseName = li.childNodes[0].nodeValue.trim().slice(0, -1);
-      const expenseValue = li.querySelector(".expense-value").innerText;
-      // console.log(expenseValue);
+      const itemName =
+        isIncomeList || isExpenseList
+          ? li.childNodes[0].nodeValue.trim().slice(0, -1)
+          : "";
+      const itemValue = li.querySelector(
+        isIncomeList ? ".income-value" : ".expense-value"
+      ).innerText;
 
-      li.innerHTML = `Nazwa: <input type ="text" value="${expenseName}" class="edit-name">
-                            Kwota: <input type ="number" value="${expenseValue}" class="edit-value">
-                            <button class = "save">Zapisz</button>`;
+      li.innerHTML = `<label for="edit-name">Nazwa:</label>
+                      <input type="text" id="edit-name" value="${itemName}" class="edit-name" />
+                      <label for="edit-value">Kwota:</label>
+                      <input type="number" id="edit-value" value="${itemValue}" class="edit-value" />
+                      <button class="save">Zapisz</button>
+                      <button class="cancel">Anuluj</button>`;
     } else if (event.target.classList.contains("save")) {
+      isEditing = false;
       const li = event.target.parentElement;
       const newName = li.querySelector(".edit-name").value;
       const newValue = parseFloat(li.querySelector(".edit-value").value);
 
       if (!isNaN(newValue) && newValue >= 0) {
-        li.innerHTML = `${newName}: <span class="expense-value">${newValue}</span>
-                                          <button class ="edit">Edytuj</button>
-                                          <button class ="delete">Usuń</button>`;
+        li.innerHTML = `${newName}: <span class="${
+          isIncomeList ? "income-value" : "expense-value"
+        }">${newValue.toFixed(2)}</span>
+                        <button class="edit">Edytuj</button>
+                        <button class="delete">Usuń</button>`;
         updateSummary();
       } else {
-        alert("Wprowadź inną kwotę!!!");
+        displayMessage("Wprowadź poprawną kwotę!", true);
       }
+    } else if (event.target.classList.contains("cancel")) {
+      isEditing = false;
+      const li = event.target.parentElement;
+      const originalName = li.querySelector(".edit-name").getAttribute("value");
+      const originalValue = li
+        .querySelector(".edit-value")
+        .getAttribute("value");
+
+      li.innerHTML = `${originalName}: <span class="${
+        isIncomeList ? "income-value" : "expense-value"
+      }">${originalValue}</span>
+                      <button class="edit">Edytuj</button>
+                      <button class="delete">Usuń</button>`;
     }
   });
 });

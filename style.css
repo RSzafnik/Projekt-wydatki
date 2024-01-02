@@ -2,11 +2,13 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f4f4f4;
+  background-color: #291807;
 }
 
 .logo {
   margin-bottom: none;
+  width: 65px;
+  height: 55px;
 }
 
 .container {
@@ -18,29 +20,7 @@ body {
   margin: 20px auto;
   padding: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-}
-
-.container::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: url(/zdjęcia/money.jpeg);
-  background-size: fixed;
-  filter: blur(2px);
-  z-index: -1;
-}
-
-header {
-  text-align: center;
-}
-
-header img {
-  padding: 20px;
-  width: 75px;
-  height: 65px;
+  background-color: #efc868;
 }
 
 .info {
@@ -63,7 +43,16 @@ header img {
   margin-top: 30px;
   padding: 30px;
   border: 1px solid #ddd;
-  background-color: rgba(167, 149, 149, 0.82);
+  background-color: #2e4707;
+}
+
+.edit-name,
+.edit-value {
+  display: flex;
+  flex-direction: column;
+  margin-top: 30px;
+  padding: 30px;
+  border: 1px solid #ddd;
 }
 
 .section-income h3,
@@ -81,18 +70,20 @@ header img {
 }
 
 .section-income input[type="text"],
-.section-expense input[type="text"] {
-  width: 80%;
+.section-expense input[type="text"],
+.section-income input[type="number"],
+.section-expense input[type="number"] {
+  width: 200px;
   padding: 8px;
   margin: 5px 0;
-  /* border: 1px solid #ddd; */
 }
 
 .section-income button,
 .section-expense button {
+  width: 85px;
   padding: 10px 15px;
-  background-color: #333;
-  color: #fff;
+  background-color: #e0573f;
+  color: #f8efdd;
   border: none;
   cursor: pointer;
   margin: 10px 0;
@@ -109,26 +100,16 @@ header img {
   list-style-type: none;
   padding: 0;
 }
-
+#income-list {
+  display: flex;
+  flex-direction: column;
+}
 .section-income li,
 .section-expense li {
   margin: 10px 0;
-  border: 1px solid #ddd;
   padding: 10px;
 }
 
 .section-expense {
   margin-left: 20px;
-}
-
-.numbered-list {
-  counter-reset: item;
-  list-style-type: none;
-  padding: 0;
-}
-
-.numbered-list li::before {
-  content: counter(item) ".";
-  counter-increment: item;
-  margin-right: 8px;
 }

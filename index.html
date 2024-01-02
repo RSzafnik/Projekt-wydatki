@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,49 +8,75 @@
   </head>
   <body>
     <div class="container">
-      <!-- tutaj będzie logo -->
       <header>
-        <img
-          class="logo"
-          src="/zdjęcia/cash-register.png"
-          alt="kasa fiskalna"
-        />
+        <img class="logo" src="assets/cash-register.png" alt="cash-register" />
       </header>
-      <!-- tutaj wpisujesz info na temat ile można wydać -->
       <section class="info">
-        <h2>
-          Możesz jeszcze wydać <span id="available-amount"> 0 </span> złotych
+        <h2 class="available-amount-heading">
+          Masz <span id="available-amount"> 0 </span> złotych
         </h2>
+        <div id="message-container"></div>
       </section>
-      <!-- wrzucasz sekcję, która będzie oddzielała zarobki i wydatki od header i info -->
-      <section class="wrapper">
-        <!-- tutaj jest sekcja zarobki -->
-        <section class="section-income">
-          <div class="income">
-            <h3>Przychody</h3>
-            <label for="income-name">Nazwa przychodu:</label>
-            <input type="text" id="income-name" />
-            <label for="income-value">Kwota:</label>
-            <input type="text" id="income-value" />
-            <button id="add-income">dodaj</button>
-            <ol id="income-list"></ol>
-            <p>Suma przychodów:<span id="total-income">0</span></p>
-          </div>
-        </section>
-        <!-- tutaj jest sekcja wydatki -->
-        <section class="section-expense">
-          <div class="expenses">
-            <h3>Wydatki</h3>
-            <label for="expense-name">Nazwa wydatku:</label>
-            <input type="text" id="expense-name" />
-            <label for="expense-value">Kwota:</label>
-            <input type="text" id="expense-value" />
-            <button id="add-expense">dodaj</button>
-            <ol id="expense-list"></ol>
-            <p>Suma wydatków:<span id="total-expense">0</span></p>
-          </div>
-        </section>
-      </section>
+      <div class="wrapper">
+        <form id="income-form">
+          <section class="section-income">
+            <h3 class="section-heading">Przychody</h3>
+            <label class="input-label" for="income-name"
+              >Nazwa przychodu:</label
+            >
+            <input
+              class="input-field"
+              type="text"
+              id="income-name"
+              name="incomeName"
+              autocomplete="off"
+              required
+            />
+            <label class="input-label" for="income-value">Kwota:</label>
+            <input
+              class="input-field"
+              type="number"
+              id="income-value"
+              name="incomeValue"
+              step="0.01"
+              required
+            />
+            <button type="submit" class="submit-button income-button">
+              Dodaj przychód
+            </button>
+            <ol class="item-list" id="income-list"></ol>
+            <p>Suma przychodów: <span id="total-income">0</span></p>
+          </section>
+        </form>
+        <form id="expense-form">
+          <section class="section-expense">
+            <h3 class="section-heading">Wydatki</h3>
+            <label class="input-label" for="expense-name">Nazwa wydatku:</label>
+            <input
+              class="input-field"
+              type="text"
+              id="expense-name"
+              name="expenseName"
+              autocomplete="off"
+              required
+            />
+            <label class="input-label" for="expense-value">Kwota:</label>
+            <input
+              class="input-field"
+              type="number"
+              id="expense-value"
+              name="expenseValue"
+              step="0.01"
+              required
+            />
+            <button type="submit" class="submit-button expense-button">
+              Dodaj wydatek
+            </button>
+            <ol class="item-list" id="expense-list"></ol>
+            <p>Suma wydatków: <span id="total-expense">0</span></p>
+          </section>
+        </form>
+      </div>
     </div>
     <script src="/app.js"></script>
   </body>
