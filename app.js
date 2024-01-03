@@ -17,10 +17,13 @@ document.addEventListener("DOMContentLoaded", function () {
   function validateInput(nameInput, valueInput) {
     const name = nameInput.value.trim();
     const value = parseFloat(valueInput.value.trim());
-    if (name === "" || /\d/.test(name)) {
-      displayMessage("Wprowadź poprawną nazwę!", true);
+    if (name === "") {
+      displayMessage("Nazwa nie może być pusta!", true);
       return false;
-    } else if (isNaN(value) || value < 0.01) {
+    } else if (/\d/.test(name) && !/[a-zA-Z]\d*/.test(name)) {
+      displayMessage("Cyfry mogą występować w nazwie tylko po literze!", true);
+      return false;
+    } else if (isNaN(value) || value <= 0) {
       displayMessage("Wprowadź poprawną kwotę!", true);
       return false;
     }
@@ -46,12 +49,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     totalIncome.innerText = totalIncomeValue.toFixed(2);
     totalExpense.innerText = totalExpenseValue.toFixed(2);
-    const calculatedAvailableAmount = totalIncomeValue - totalExpenseValue;
-    availableAmount.innerText = calculatedAvailableAmount.toFixed(2);
+    availableAmount.innerText = (totalIncomeValue - totalExpenseValue).toFixed(
+      2
+    );
 
-    if (calculatedAvailableAmount < 0) {
+    if (availableAmount.innerText < 0) {
       displayMessage(`Jesteś na minusie!`, true);
-    } else if (calculatedAvailableAmount > 0) {
+    } else if (availableAmount.innerText > 0) {
       displayMessage(`Jesteś na plusie!`, false);
     } else {
       displayMessage("", false);
@@ -60,15 +64,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   incomeForm.addEventListener("submit", function (event) {
     event.preventDefault();
-    if (isEditing) {
-      displayMessage("Zakończ edycję przed dodaniem kolejnego elementu", true);
-      return;
-    }
     const incomeNameInput = document.getElementById("income-name");
     const incomeValueInput = document.getElementById("income-value");
-    if (!incomeNameInput.value.trim() || !incomeValueInput.value.trim()) {
-      displayMessage("Proszę wypełnić wszystkie pola!", true);
-    } else if (validateInput(incomeNameInput, incomeValueInput)) {
+
+    if (!isEditing && validateInput(incomeNameInput, incomeValueInput)) {
       const li = document.createElement("li");
       li.innerHTML = `${
         incomeNameInput.value
@@ -85,15 +84,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   expenseForm.addEventListener("submit", function (event) {
     event.preventDefault();
-    if (isEditing) {
-      displayMessage("Zakończ edycję przed dodaniem kolejnego elementu", true);
-      return;
-    }
     const expenseNameInput = document.getElementById("expense-name");
     const expenseValueInput = document.getElementById("expense-value");
-    if (!expenseNameInput.value.trim() || !expenseValueInput.value.trim()) {
-      displayMessage("Proszę wypełnić wszystkie pola!", true);
-    } else if (validateInput(expenseNameInput, expenseValueInput)) {
+
+    if (!isEditing && validateInput(expenseNameInput, expenseValueInput)) {
       const li = document.createElement("li");
       li.innerHTML = `${
         expenseNameInput.value
@@ -119,47 +113,42 @@ document.addEventListener("DOMContentLoaded", function () {
     } else if (event.target.classList.contains("edit")) {
       isEditing = true;
       const li = event.target.parentElement;
-      const itemName =
-        isIncomeList || isExpenseList
-          ? li.childNodes[0].nodeValue.trim().slice(0, -1)
-          : "";
-      const itemValue = li.querySelector(
-        isIncomeList ? ".income-value" : ".expense-value"
-      ).innerText;
+      const itemName = li.childNodes[0].nodeValue.trim().slice(0, -1);
+      const itemValue = isIncomeList
+        ? li.querySelector(".income-value").innerText
+        : li.querySelector(".expense-value").innerText;
+
+      li.dataset.originalName = itemName;
+      li.dataset.originalValue = itemValue;
 
       li.innerHTML = `<label for="edit-name">Nazwa:</label>
-                      <input type="text" id="edit-name" value="${itemName}" class="edit-name" />
-                      <label for="edit-value">Kwota:</label>
-                      <input type="number" id="edit-value" value="${itemValue}" class="edit-value" />
-                      <button class="save">Zapisz</button>
-                      <button class="cancel">Anuluj</button>`;
+                    <input type="text" id="edit-name" value="${itemName}" class="edit-name" />
+                    <label for="edit-value">Kwota:</label>
+                    <input type="number" id="edit-value" value="${itemValue}" class="edit-value" />
+                    <button class="save">Zapisz</button>
+                    <button class="cancel">Anuluj</button>`;
     } else if (event.target.classList.contains("save")) {
-      isEditing = false;
       const li = event.target.parentElement;
-      const newName = li.querySelector(".edit-name").value;
-      const newValue = parseFloat(li.querySelector(".edit-value").value);
+      const newNameInput = li.querySelector(".edit-name");
+      const newValueInput = li.querySelector(".edit-value");
 
-      if (!isNaN(newValue) && newValue >= 0) {
-        li.innerHTML = `${newName}: <span class="${
+      if (validateInput(newNameInput, newValueInput)) {
+        const newValue = parseFloat(newValueInput.value);
+        li.innerHTML = `${newNameInput.value}: <span class="${
           isIncomeList ? "income-value" : "expense-value"
         }">${newValue.toFixed(2)}</span>
                         <button class="edit">Edytuj</button>
                         <button class="delete">Usuń</button>`;
         updateSummary();
-      } else {
-        displayMessage("Wprowadź poprawną kwotę!", true);
+        isEditing = false;
       }
     } else if (event.target.classList.contains("cancel")) {
       isEditing = false;
       const li = event.target.parentElement;
-      const originalName = li.querySelector(".edit-name").getAttribute("value");
-      const originalValue = li
-        .querySelector(".edit-value")
-        .getAttribute("value");
 
-      li.innerHTML = `${originalName}: <span class="${
+      li.innerHTML = `${li.dataset.originalName}: <span class="${
         isIncomeList ? "income-value" : "expense-value"
-      }">${originalValue}</span>
+      }">${parseFloat(li.dataset.originalValue).toFixed(2)}</span>
                       <button class="edit">Edytuj</button>
                       <button class="delete">Usuń</button>`;
     }
